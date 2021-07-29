@@ -1,0 +1,23 @@
+{
+    "user_id":"user",
+    "activity": [
+    {
+        "date": "2021-07-01",
+        "calories": 100
+    },
+    {
+        "date": "2021-07-02",
+        "calories": 3000
+    },
+    {
+        "date": "2021-07-03",
+        "calories": 200
+    },
+    {
+        "date": "2021-07-04",
+        "calories": 402
+    }
+
+
+    ]
+}
