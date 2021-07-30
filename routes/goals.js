@@ -1,15 +1,7 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
-const app = express();
-const cors = require('cors');
+const router = express.Router();
 
-app.use(cors());
-
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-app.use(bodyParser.json());
 
 var fs = require('fs');
 var path = require('path');
@@ -20,7 +12,8 @@ var DB = JSON.parse(
     ) 
   );
 
-app.get('/goals', (req, res) => {
+router.get('/', (req, res) => {
+
     const ret_goal = Number(DB.goal);
     const ret_id = DB.user_id;
 
@@ -33,8 +26,8 @@ app.get('/goals', (req, res) => {
 })
 
 
-app.post('/goals', function(req, res){
-    let new_goal = req.body.goals;
+router.post('/', function(req, res){
+    let new_goal = req.body.goal;
     let result = DB;
     result.goal = new_goal;
     fs.writeFileSync(
@@ -45,6 +38,4 @@ app.post('/goals', function(req, res){
     res.send('POST request to the homepage');
 })
 
-app.listen(3001, () => console.log('Listening on port 3001'));
-
-module.exports = app;
+module.exports = router;
