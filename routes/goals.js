@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 
     let ret = {
         user_id: ret_id,
-        ret_goal: ret_goal
+        goal: ret_goal
     };
     console.log(ret);
     res.json(ret);
