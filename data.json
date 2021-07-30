@@ -1,5 +1,6 @@
 {
     "user_id":"user",
+    "goal":2000,
     "activity": [
     {
         "date": "2021-07-01",

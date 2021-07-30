@@ -9,7 +9,11 @@ const CONFIG = {
 }
 
 axios.request(CONFIG).then((res)=>{
-  console.log(res.data);
+  for(let v in res.data['activities-tracker-calories']){
+    console.log(res.data['activities-tracker-calories'][v]['dateTime']);
+    console.log(res.data['activities-tracker-calories'][v]['value']);
+  }
+
 }).catch((error)=>{
   console.log(error);
 });
