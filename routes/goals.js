@@ -2,6 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
+
 var fs = require('fs');
 var path = require('path');
 
@@ -12,6 +13,7 @@ var DB = JSON.parse(
   );
 
 router.get('/', (req, res) => {
+
     const ret_goal = Number(DB.goal);
     const ret_id = DB.user_id;
 
@@ -35,6 +37,5 @@ router.post('/', function(req, res){
 
     res.send('POST request to the homepage');
 })
-
 
 module.exports = router;
