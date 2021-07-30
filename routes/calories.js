@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+var router = express.Router();
 
 const axios = require('axios');
 
@@ -21,12 +21,13 @@ let data = {
     ]
 };
 
-app.get('/calories', (req, res) => {
-    res.set({'Access-Control-Allow-Origin': '*'});
+
+router.get('/', (req, res, next) => {
+
     axios.request(CONFIG).then((res1)=>{
         for(let v in res1.data['activities-tracker-calories']){
-            let dateTime = res1.data['activities-tracker-calories'][v]['dataTime'];
             let daily_calories = res1.data['activities-tracker-calories'][v]['value'];
+            let dateTime = res1.data['activities-tracker-calories'][v]['dateTime'];
             let day_data = {
                 calories : Number(daily_calories),
                 date : dateTime
@@ -35,11 +36,11 @@ app.get('/calories', (req, res) => {
             
         }
         console.log(JSON.stringify(data));
-        res.json(JSON.stringify(data));    
+        res.json(data); 
       }).catch((error)=>{
-        console.log(error);
+        
       });
 })
-app.listen(3001, () => console.log('Listening on port 3001'));
 
-module.exports = app;
+
+module.exports = router;
