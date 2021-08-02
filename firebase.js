@@ -1,4 +1,5 @@
 const firebase = require("firebase");
+var admin = require("firebase-admin");
 
 //ここから
 function firebase_init() {
@@ -12,6 +13,11 @@ function firebase_init() {
   };
 
   firebase.initializeApp(firebaseConfig);
+  var serviceAccount = require("./firebase_setting/enpit-5b754-firebase-adminsdk-qlsr0-87d2f3df4b.json");
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 }
 //ここまででfirebaseの認証をするので，使う時は呼び出さないと行けない
 //ユーザー認証の関数
@@ -30,7 +36,6 @@ function add_user(email, password) {
     });
 }
 
-firebase_init();
 function user_login(email, password) {
   firebase
     .auth()
@@ -46,6 +51,17 @@ function user_login(email, password) {
       var errorMessage = error.message;
     });
 }
+
+async function get_data(collection) {
+  var db = admin.firestore();
+  const snapshot = await db.collection(collection).get();
+  snapshot.forEach((doc) => {
+    console.log(doc.data());
+  });
+}
 // テスト用のユーザー
 var email = "hoge@example.com";
 var password = "password";
+firebase_init();
+// get_data("rooms");
+// get_data("users");
