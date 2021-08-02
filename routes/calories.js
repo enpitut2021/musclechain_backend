@@ -7,10 +7,11 @@ require('date-utils');
 var dt = new Date();
 var today = dt.toFormat("YYYY-MM-DD");
 
+
 const TOKEN = `eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMkM4SkoiLCJzdWIiOiI5ODM5R0IiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNjI4MTQyOTkxLCJpYXQiOjE2Mjc1MzgyMzl9.jLRirQcyAP8jzSMJaQDM3bFen9THCZ7npzAIShApZNc`;
 const CONFIG = {
     baseURL: 'https://api.fitbit.com/1',
-    url: `/user/-/activities/tracker/calories/date/`,
+    url: ``,
     method: 'get',
     headers: {'Authorization': `Bearer ${TOKEN}`}
 }
@@ -28,12 +29,10 @@ let data = {
 
 router.get('/', (req, res, next) => {
 
-    var end_date = (typeof req.body["end-date"] !== 'undefined') ? req.body["end-date"] : today;
-    var base_date = req.body["base-date"];
+    const end_date = (typeof req.body["end-date"] !== 'undefined') ? req.body["end-date"] : today;
+    const base_date = (typeof req.body["base-date"] !== 'undefined') ? req.body["base-date"]: "2021-07-24";
 
-    console.log(base_date);
-    console.log(end_date);
-    CONFIG.url+=`${base_date}/${end_date}.json`;
+    CONFIG.url=`/user/-/activities/tracker/calories/date/${base_date}/${end_date}.json`;
 
     axios.request(CONFIG).then((res1)=>{
         for(let v in res1.data['activities-tracker-calories']){
@@ -52,6 +51,5 @@ router.get('/', (req, res, next) => {
         
       });
 })
-
 
 module.exports = router;
