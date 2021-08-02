@@ -1,6 +1,12 @@
 const firebase = require("firebase");
 var admin = require("firebase-admin");
 
+const express = require("express");
+var router = express.Router();
+
+const axios = require("axios");
+var init = false;
+
 //ここから
 function firebase_init() {
   var firebaseConfig = {
@@ -13,22 +19,23 @@ function firebase_init() {
   };
 
   firebase.initializeApp(firebaseConfig);
-  var serviceAccount = require("./firebase_setting/enpit-5b754-firebase-adminsdk-qlsr0-87d2f3df4b.json");
+  var serviceAccount = require("../firebase_setting/enpit-5b754-firebase-adminsdk-qlsr0-87d2f3df4b.json");
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
+  init = true;
 }
 //ここまででfirebaseの認証をするので，使う時は呼び出さないと行けない
 //ユーザー認証の関数
-function add_user(email, password) {
+async function add_user(email, password) {
   var ok = false;
-  firebase
+  await firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
       var user = userCredential.user;
-      console.log(user);
+      // console.log(user);
       ok = true;
     })
     .catch((error) => {
@@ -39,9 +46,9 @@ function add_user(email, password) {
   return ok;
 }
 
-function user_login(email, password) {
+async function user_login(email, password) {
   var ok = false;
-  firebase
+  await firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
@@ -81,10 +88,42 @@ async function set_data(collection) {
     end_date: endDate,
   });
 }
-// テスト用のユーザー
-var email = "hoge@example.com";
-var password = "password";
-firebase_init();
-// get_data("rooms");
-// get_data("users");
-set_data("rooms");
+
+router.post("/login", async (req, res, next) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  if (!init) {
+    firebase_init();
+  }
+  var result = await user_login(email, password);
+  console.log(result);
+  var s = {
+    result: result ? 1 : 0,
+  };
+  res.status(200).send(s);
+});
+
+router.get("/", function (req, res) {
+  console.log("firebase access ok!");
+  res.send("ok!");
+});
+
+router.post("/register", async (req, res, next) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  if (!init) {
+    firebase_init();
+  }
+  var result = await add_user(email, password);
+  console.log(result);
+  var s = {
+    result: result ? 1 : 0,
+  };
+  res.status(200).send(s);
+});
+
+router.get("/", function (req, res) {
+  console.log("firebase access ok!");
+  res.send("ok!");
+});
+module.exports = router;
