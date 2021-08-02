@@ -24,12 +24,6 @@ const CONFIG = {
 
 CONFIG.url = `/user/-/activities/calories/date/2021-07-27/2021-08-02.json`;
 
-/*axios.request(CONFIG).then((res1) => {
-    console.log(res1.data);
-}).catch((error) => {
-    console.log(error);
-});*/
-
 axios.request(CONFIG).then((res1) => {
     for (let v in res1.data['activities-calories']) {
         let daily_calories = res1.data['activities-calories'][v]['value'];
