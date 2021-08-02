@@ -5,6 +5,7 @@ const app = express();
 
 const calories = require('./routes/calories');
 const goals = require('./routes/goals');
+const rooms = require('./routes/rooms');
 
 app.use(cors());
 app.use(bodyParser.urlencoded({
@@ -13,6 +14,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.use('/calories', calories);
+app.use('/rooms', rooms);
 app.use('/goals', goals);
 
 app.listen(3003, () => console.log('Listening on port 3003'));
