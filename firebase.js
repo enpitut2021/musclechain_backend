@@ -14,9 +14,6 @@ function firebase_init() {
   firebase.initializeApp(firebaseConfig);
 }
 //ここまででfirebaseの認証をするので，使う時は呼び出さないと行けない
-
-var email = "hoge@example.com";
-var password = "password";
 //ユーザー認証の関数
 function add_user(email, password) {
   firebase
@@ -32,3 +29,23 @@ function add_user(email, password) {
       console.log(errorCode, errorMsg);
     });
 }
+
+firebase_init();
+function user_login(email, password) {
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // Signed in
+      var user = userCredential.user;
+      console.log(user.uid);
+      console.log(user.email);
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+    });
+}
+// テスト用のユーザー
+var email = "hoge@example.com";
+var password = "password";
