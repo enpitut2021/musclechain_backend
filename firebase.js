@@ -22,21 +22,25 @@ function firebase_init() {
 //ここまででfirebaseの認証をするので，使う時は呼び出さないと行けない
 //ユーザー認証の関数
 function add_user(email, password) {
+  var ok = false;
   firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
       var user = userCredential.user;
       console.log(user);
+      ok = true;
     })
     .catch((error) => {
       var errorCode = error.code;
       var errorMsg = error.message;
       console.log(errorCode, errorMsg);
     });
+  return ok;
 }
 
 function user_login(email, password) {
+  var ok = false;
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
@@ -45,11 +49,13 @@ function user_login(email, password) {
       var user = userCredential.user;
       console.log(user.uid);
       console.log(user.email);
+      ok = true;
     })
     .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
     });
+  return ok;
 }
 
 async function get_data(collection) {
@@ -58,6 +64,22 @@ async function get_data(collection) {
   snapshot.forEach((doc) => {
     console.log(doc.data());
   });
+  return snapshot;
+}
+
+async function set_data(collection) {
+  var db = admin.firestore();
+  const docRef = db.collection(collection).doc();
+  var endDate = new Date();
+  // var end = currentDate.setDate(currentDate.getDate() + 1);
+
+  endDate.setDate(endDate.getDate() + 1);
+  await docRef.set({
+    start_date: new Date(),
+    room_id: 1000,
+    participants: [],
+    end_date: endDate,
+  });
 }
 // テスト用のユーザー
 var email = "hoge@example.com";
@@ -65,3 +87,4 @@ var password = "password";
 firebase_init();
 // get_data("rooms");
 // get_data("users");
+set_data("rooms");
