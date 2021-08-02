@@ -1,1 +1,1 @@
-{"user_id":"user","goal":4000,"activity":[{"date":"2021-07-01","calories":100},{"date":"2021-07-02","calories":3000},{"date":"2021-07-03","calories":200},{"date":"2021-07-04","calories":402},{"date":"2021-07-05","calories":300},{"date":"2021-07-06","calories":2000},{"date":"2021-07-07","calories":100},{"date":"2021-07-08","calories":305}]}
+{"user_id":"user","activity":{"2021-08-02":{"calories":2000,"goal":0}}}
