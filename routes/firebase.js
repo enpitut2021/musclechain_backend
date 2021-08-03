@@ -125,7 +125,7 @@ router.get("/", function (req, res) {
 
 router.post("/calories", async (req, res, next) => {
   var uid = req.body.uid;
-  console.log(uid);
+  // console.log(uid);
   if (!init) {
     firebase_init();
   }
@@ -147,7 +147,7 @@ router.get("/rooms", async (req, res, next) => {
     document_data,
     tmp;
   documents.forEach((doc) => {
-    console.log(doc.data());
+    // console.log(doc.data());
     document_data = doc.data();
     tmp = {
       room_id: document_data["room_id"],
@@ -179,7 +179,7 @@ router.post("/userinfo", async (req, res, next) => {
   }
   var doc = await get_data_document("users", uid);
   var data = doc.data();
-  console.log(data);
+  // console.log(data);
   if (data == -1) {
     res.status(500).send("uid is not valid");
   } else {
@@ -198,7 +198,7 @@ router.post("/userinfo", async (req, res, next) => {
 async function set_room_data(collection, room_id, room_data) {
   var db = admin.firestore();
   const docRef = db.collection(collection).doc(room_id);
-  console.log(room_data);
+  // console.log(room_data);
   const res = await docRef.set({
     start_date: room_data["start_date"],
     end_date: room_data["end_date"],
