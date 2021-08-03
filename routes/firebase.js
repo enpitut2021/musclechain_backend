@@ -4,7 +4,6 @@ var admin = require("firebase-admin");
 const express = require("express");
 var router = express.Router();
 
-const axios = require("axios");
 var init = false;
 
 //ここから
@@ -41,37 +40,60 @@ async function add_user(email, password) {
     .catch((error) => {
       var errorCode = error.code;
       var errorMsg = error.message;
-      console.log(errorCode, errorMsg);
+      // console.log(errorCode, errorMsg);
     });
   return ok;
 }
 
 async function user_login(email, password) {
-  var ok = false;
+  var msg;
   await firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       // Signed in
       var user = userCredential.user;
-      console.log(user.uid);
-      console.log(user.email);
-      ok = true;
+      // console.log(user.uid);
+      // console.log(user.email);
+      msg = true;
     })
     .catch((error) => {
       var errorCode = error.code;
-      var errorMessage = error.message;
+      var errorMsg = error.message;
+      // console.log(errorCode, errorMsg);
+      msg = {
+        code: errorCode,
+        msg: errorMsg,
+      };
     });
-  return ok;
+  return msg;
+}
+async function get_data_document(collection, doc) {
+  var db = admin.firestore();
+  var ref = db.collection(collection).doc(doc);
+  const firebase_doc = await ref.get();
+  // console.log(firebase_doc);
+  if (!firebase_doc.exists) {
+    return -1;
+  } else {
+    // console.log(firebase_doc.data());
+    return firebase_doc;
+  }
 }
 
-async function get_data(collection) {
+async function get_data_collection(collection) {
   var db = admin.firestore();
-  const snapshot = await db.collection(collection).get();
-  snapshot.forEach((doc) => {
-    console.log(doc.data());
-  });
-  return snapshot;
+  const ref = db.collection(collection);
+  const snapshot = await ref.get();
+  // console.log(firebase_doc);
+  if (snapshot.empty) {
+    return -1;
+  } else {
+    // snapshot.forEach((doc) => {
+    //   console.log(doc.id, "=>", doc.data());
+    // });
+    return snapshot;
+  }
 }
 
 async function set_data(collection) {
@@ -96,16 +118,10 @@ router.post("/login", async (req, res, next) => {
     firebase_init();
   }
   var result = await user_login(email, password);
-  console.log(result);
-  var s = {
-    result: result ? 1 : 0,
-  };
-  res.status(200).send(s);
-});
-
-router.get("/", function (req, res) {
-  console.log("firebase access ok!");
-  res.send("ok!");
+  if (result == 1) res.status(200).send("ok");
+  else {
+    res.status(result["code"]).send(result["msg"]);
+  }
 });
 
 router.post("/register", async (req, res, next) => {
@@ -115,7 +131,6 @@ router.post("/register", async (req, res, next) => {
     firebase_init();
   }
   var result = await add_user(email, password);
-  console.log(result);
   var s = {
     result: result ? 1 : 0,
   };
@@ -123,7 +138,78 @@ router.post("/register", async (req, res, next) => {
 });
 
 router.get("/", function (req, res) {
-  console.log("firebase access ok!");
   res.send("ok!");
 });
+
+router.get("/calories", async (req, res, next) => {
+  var uid = req.body.uid;
+  // console.log(uid);
+  if (!init) {
+    firebase_init();
+  }
+  var calories = await get_data_document("users", uid);
+  if (calories == -1) {
+    res.status(500).send("uid is not valid");
+  } else {
+    var calories_list = calories.data().calories;
+    res.status(200).send(calories_list);
+  }
+});
+
+router.get("/rooms", async (req, res, next) => {
+  if (!init) {
+    firebase_init();
+  }
+  var documents = await get_data_collection("rooms");
+  var data = [],
+    document_data,
+    tmp;
+  documents.forEach((doc) => {
+    // console.log(doc.data());
+    document_data = doc.data();
+    tmp = {
+      room_id: document_data["room_id"],
+      room_document_id: doc.id,
+    };
+    data.push(tmp);
+  });
+  res.status(200).send(data);
+});
+
+router.get("/uid", async (req, res, next) => {
+  if (!init) {
+    firebase_init();
+  }
+  const user = firebase.auth().currentUser;
+  if (user != null) {
+    res.status(200).send({ uid: user.uid });
+  } else {
+    res.status(500).send("user is not exit");
+  }
+});
+
+router.get("/userinfo", async (req, res, next) => {
+  var uid = req.body.uid;
+  // console.log(uid);
+  if (!init) {
+    firebase_init();
+  }
+  var doc = await get_data_document("users", uid);
+  var data = doc.data();
+  // console.log(data);
+  if (data == -1) {
+    res.status(500).send("uid is not valid");
+  } else {
+    var calories = data.calories;
+    var user_name = data.user_name;
+    var room_id = data.room._path["segments"][1];
+    var send = {
+      calories: calories,
+      user_name: user_name,
+      room_id: room_id,
+    };
+    res.status(200).send(send);
+  }
+});
+
 module.exports = router;
