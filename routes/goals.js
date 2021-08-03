@@ -27,6 +27,16 @@ router.post("/", function (req, res) {
     path.resolve(__dirname, "../data.json"),
     JSON.stringify(result)
   );
+  
+let data = {
+    "user_id" : "user",
+    "activity" : {
+        "2021-08-02" : {
+            "calories" : 2000,
+            "goal" : 0
+        }
+    }
+};
 
   res.send("POST request to the homepage");
 });
