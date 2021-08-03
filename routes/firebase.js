@@ -4,7 +4,6 @@ var admin = require("firebase-admin");
 const express = require("express");
 var router = express.Router();
 
-const axios = require("axios");
 var init = false;
 
 //ここから
@@ -47,7 +46,7 @@ async function add_user(email, password) {
 }
 
 async function user_login(email, password) {
-  var ok = false;
+  var msg;
   await firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
@@ -56,23 +55,30 @@ async function user_login(email, password) {
       var user = userCredential.user;
       console.log(user.uid);
       console.log(user.email);
-      ok = true;
+      msg = true;
     })
     .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
       console.log(errorCode, errorMsg);
+      msg = {
+        code: errorCode,
+        msg: errorMsg,
+      };
     });
-  return ok;
+  return msg;
 }
-
-async function get_data(collection) {
+async function get_data(collection, doc) {
   var db = admin.firestore();
-  const snapshot = await db.collection(collection).get();
-  snapshot.forEach((doc) => {
-    console.log(doc.data());
-  });
-  return snapshot;
+  var ref = db.collection(collection).doc(doc);
+  const firebase_doc = await ref.get();
+  console.log(firebase_doc.exists);
+  if (!firebase_doc.exists) {
+    return -1;
+  } else {
+    // console.log(firebase_doc.data());
+    return firebase_doc.data();
+  }
 }
 
 async function set_data(collection) {
@@ -97,11 +103,10 @@ router.post("/login", async (req, res, next) => {
     firebase_init();
   }
   var result = await user_login(email, password);
-  console.log(result);
-  var s = {
-    result: result ? 1 : 0,
-  };
-  res.status(200).send(s);
+  if (result == 1) res.status(200).send(s);
+  else {
+    res.status(result["code"]).send(result["msg"]);
+  }
 });
 
 router.get("/", function (req, res) {
@@ -126,4 +131,20 @@ router.get("/", function (req, res) {
   console.log("firebase access ok!");
   res.send("ok!");
 });
+
+router.get("/calories", async (req, res, next) => {
+  var uid = req.body.uid;
+  // console.log(uid);
+  if (!init) {
+    firebase_init();
+  }
+  var calories = await get_data("users", uid);
+  if (calories == -1) {
+    res.status(500).send("uid is not valid");
+  } else {
+    var calories_list = calories.calories;
+    res.status(200).send(calories_list);
+  }
+});
+
 module.exports = router;
