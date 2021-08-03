@@ -1,15 +1,17 @@
-const express = require('express');
+const express = require("express");
 var router = express.Router();
 
-const axios = require('axios');
-require('date-utils');
+const firebase = require("firebase");
+var admin = require("firebase-admin");
+
+const axios = require("axios");
+require("date-utils");
 
 var dt = new Date();
 var today = dt.toFormat("YYYY-MM-DD");
 var dt_week = new Date();
 dt_week.setDate(dt_week.getDate() - 6);
 var weekago = dt_week.toFormat("YYYY-MM-DD");
-
 
 const TOKEN = `eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMkM4SkoiLCJzdWIiOiI5ODM5R0IiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNjI4MTQyOTkxLCJpYXQiOjE2Mjc1MzgyMzl9.jLRirQcyAP8jzSMJaQDM3bFen9THCZ7npzAIShApZNc`;
 const CONFIG = {
