@@ -68,9 +68,22 @@ async function user_login(email, password) {
     });
   return msg;
 }
-async function get_data(collection, doc) {
+async function get_data_document(collection, doc) {
   var db = admin.firestore();
   var ref = db.collection(collection).doc(doc);
+  const firebase_doc = await ref.get();
+  // console.log(firebase_doc);
+  if (!firebase_doc.exists) {
+    return -1;
+  } else {
+    // console.log(firebase_doc.data());
+    return firebase_doc;
+  }
+}
+
+async function get_data_collection(collection) {
+  var db = admin.firestore();
+  var ref = db.collection(collection);
   const firebase_doc = await ref.get();
   // console.log(firebase_doc);
   if (!firebase_doc.exists) {
@@ -103,7 +116,7 @@ router.post("/login", async (req, res, next) => {
     firebase_init();
   }
   var result = await user_login(email, password);
-  if (result == 1) res.status(200).send(s);
+  if (result == 1) res.status(200).send("ok");
   else {
     res.status(result["code"]).send(result["msg"]);
   }
@@ -133,7 +146,7 @@ router.get("/calories", async (req, res, next) => {
   if (!init) {
     firebase_init();
   }
-  var calories = await get_data("users", uid);
+  var calories = await get_data_document("users", uid);
   if (calories == -1) {
     res.status(500).send("uid is not valid");
   } else {
@@ -142,20 +155,23 @@ router.get("/calories", async (req, res, next) => {
   }
 });
 
-router.get("/room", async (req, res, next) => {
-  var uid = req.body.uid;
-  // console.log(uid);
+router.get("/rooms", async (req, res, next) => {
   if (!init) {
     firebase_init();
   }
-  var doc = await get_data("users", uid);
-  var data = doc.data();
-  // console.log(data);
-  if (data == -1) {
-    res.status(500).send("uid is not valid");
+  var documents = await get_data_collection("rooms");
+  console.log(documents);
+});
+
+router.get("/uid", async (req, res, next) => {
+  if (!init) {
+    firebase_init();
+  }
+  const user = firebase.auth().currentUser;
+  if (user != null) {
+    res.status(200).send({ uid: user.uid });
   } else {
-    var room_id = data.room._path["segments"][1];
-    res.status(200).send({ room_id: room_id });
+    res.status(500).send("user is not exit");
   }
 });
 
@@ -165,7 +181,7 @@ router.get("/userinfo", async (req, res, next) => {
   if (!init) {
     firebase_init();
   }
-  var doc = await get_data("users", uid);
+  var doc = await get_data_document("users", uid);
   var data = doc.data();
   // console.log(data);
   if (data == -1) {
