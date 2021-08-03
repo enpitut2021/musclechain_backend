@@ -120,7 +120,7 @@ router.post("/login", async (req, res, next) => {
   var result = await user_login(email, password);
   if (result == 1) res.status(200).send("ok");
   else {
-    res.status(result["code"]).send(result["msg"]);
+    res.status(500).send(result["msg"]);
   }
 });
 
