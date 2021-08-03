@@ -171,7 +171,7 @@ router.get("/uid", async (req, res, next) => {
   }
 });
 
-router.get("/userinfo", async (req, res, next) => {
+router.post("/userinfo", async (req, res, next) => {
   var uid = req.body.uid;
   // console.log(uid);
   if (!init) {
