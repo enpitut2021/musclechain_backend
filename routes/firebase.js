@@ -40,7 +40,7 @@ async function add_user(email, password) {
     .catch((error) => {
       var errorCode = error.code;
       var errorMsg = error.message;
-      console.log(errorCode, errorMsg);
+      // console.log(errorCode, errorMsg);
     });
   return ok;
 }
@@ -53,14 +53,14 @@ async function user_login(email, password) {
     .then((userCredential) => {
       // Signed in
       var user = userCredential.user;
-      console.log(user.uid);
-      console.log(user.email);
+      // console.log(user.uid);
+      // console.log(user.email);
       msg = true;
     })
     .catch((error) => {
       var errorCode = error.code;
-      var errorMessage = error.message;
-      console.log(errorCode, errorMsg);
+      var errorMsg = error.message;
+      // console.log(errorCode, errorMsg);
       msg = {
         code: errorCode,
         msg: errorMsg,
@@ -83,14 +83,16 @@ async function get_data_document(collection, doc) {
 
 async function get_data_collection(collection) {
   var db = admin.firestore();
-  var ref = db.collection(collection);
-  const firebase_doc = await ref.get();
+  const ref = db.collection(collection);
+  const snapshot = await ref.get();
   // console.log(firebase_doc);
-  if (!firebase_doc.exists) {
+  if (snapshot.empty) {
     return -1;
   } else {
-    // console.log(firebase_doc.data());
-    return firebase_doc;
+    // snapshot.forEach((doc) => {
+    //   console.log(doc.id, "=>", doc.data());
+    // });
+    return snapshot;
   }
 }
 
@@ -136,7 +138,6 @@ router.post("/register", async (req, res, next) => {
 });
 
 router.get("/", function (req, res) {
-  console.log("firebase access ok!");
   res.send("ok!");
 });
 
@@ -160,7 +161,19 @@ router.get("/rooms", async (req, res, next) => {
     firebase_init();
   }
   var documents = await get_data_collection("rooms");
-  console.log(documents);
+  var data = [],
+    document_data,
+    tmp;
+  documents.forEach((doc) => {
+    // console.log(doc.data());
+    document_data = doc.data();
+    tmp = {
+      room_id: document_data["room_id"],
+      room_document_id: doc.id,
+    };
+    data.push(tmp);
+  });
+  res.status(200).send(data);
 });
 
 router.get("/uid", async (req, res, next) => {
