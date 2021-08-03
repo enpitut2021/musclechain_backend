@@ -147,11 +147,12 @@ router.get("/rooms", async (req, res, next) => {
     document_data,
     tmp;
   documents.forEach((doc) => {
-    // console.log(doc.data());
+    console.log(doc.data());
     document_data = doc.data();
     tmp = {
       room_id: document_data["room_id"],
       room_document_id: doc.id,
+      participants: document_data["participants"],
     };
     data.push(tmp);
   });
