@@ -1,6 +1,9 @@
 const express = require("express");
 var router = express.Router();
 
+const firebase = require("firebase");
+var admin = require("firebase-admin");
+
 const axios = require("axios");
 require("date-utils");
 
@@ -58,4 +61,3 @@ router.get("/", (req, res, next) => {
 });
 
 module.exports = router;
-

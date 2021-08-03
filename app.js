@@ -13,6 +13,7 @@ app.use(
     extended: true,
   })
 );
+
 app.use(bodyParser.json());
 
 app.use("/calories", calories);

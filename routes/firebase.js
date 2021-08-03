@@ -109,11 +109,6 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.get("/", function (req, res) {
-  console.log("firebase access ok!");
-  res.send("ok!");
-});
-
 router.post("/register", async (req, res, next) => {
   let email = req.body.email;
   let password = req.body.password;
