@@ -123,7 +123,7 @@ router.get("/", function (req, res) {
   res.send("ok!");
 });
 
-router.get("/calories", async (req, res, next) => {
+router.post("/calories", async (req, res, next) => {
   var uid = req.body.uid;
   console.log(uid);
   if (!init) {
@@ -198,7 +198,10 @@ async function set_room_data(collection, room_id, room_data) {
   var db = admin.firestore();
   const docRef = db.collection(collection).doc(room_id);
   const res = await docRef.set({
-    room_data,
+    start_time: room_data["start_time"],
+    end_time: room_data["end_time"],
+    participants: room_data["participants"],
+    room_id: room_data["room_id"],
   });
   return res;
 }
@@ -218,9 +221,18 @@ router.post("/roomjoin", async (req, res, next) => {
   console.log(room_data);
   var result = await set_room_data("rooms", room_id, room_data);
   var user_data = await get_data_document("users", uid);
-  console.log(user_data);
   var db = admin.firestore();
-  const docRef = db.collection(collection).doc(room_id);
+  const room_ref = db.collection("rooms").doc(room_id);
+  var user_room_ref = user_data.data()["room"];
+  user_data.data()["room"] = room_ref;
+  const user_ref = db.collection("users").doc(uid);
+  const user_res = await user_ref.set({
+    calories: user_data.data()["calories"],
+    room: user_data.data()["room"],
+    user_name: user_data.data()["user_name"],
+  });
+  var prev_user_room = await user_room_ref.get();
+  console.log(prev_user_room);
   res.send("ok");
 });
 
