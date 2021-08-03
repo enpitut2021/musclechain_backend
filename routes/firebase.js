@@ -178,13 +178,13 @@ router.get("/userinfo", async (req, res, next) => {
   }
   var doc = await get_data_document("users", uid);
   var data = doc.data();
-  // console.log(data);
+  console.log(data);
   if (data == -1) {
     res.status(500).send("uid is not valid");
   } else {
     var calories = data.calories;
     var user_name = data.user_name;
-    var room_id = data.room._path["segments"][1];
+    var room_id = data.room;
     var send = {
       calories: calories,
       user_name: user_name,
