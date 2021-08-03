@@ -69,6 +69,7 @@ async function user_login(email, password) {
   return msg;
 }
 async function get_data_document(collection, doc) {
+  // console.log(collection, doc);
   var db = admin.firestore();
   var ref = db.collection(collection).doc(doc);
   const firebase_doc = await ref.get();
@@ -76,7 +77,6 @@ async function get_data_document(collection, doc) {
   if (!firebase_doc.exists) {
     return -1;
   } else {
-    // console.log(firebase_doc.data());
     return firebase_doc;
   }
 }
@@ -89,26 +89,8 @@ async function get_data_collection(collection) {
   if (snapshot.empty) {
     return -1;
   } else {
-    // snapshot.forEach((doc) => {
-    //   console.log(doc.id, "=>", doc.data());
-    // });
     return snapshot;
   }
-}
-
-async function set_data(collection) {
-  var db = admin.firestore();
-  const docRef = db.collection(collection).doc();
-  var endDate = new Date();
-  // var end = currentDate.setDate(currentDate.getDate() + 1);
-
-  endDate.setDate(endDate.getDate() + 1);
-  await docRef.set({
-    start_date: new Date(),
-    room_id: 1000,
-    participants: [],
-    end_date: endDate,
-  });
 }
 
 router.post("/login", async (req, res, next) => {
@@ -143,7 +125,7 @@ router.get("/", function (req, res) {
 
 router.get("/calories", async (req, res, next) => {
   var uid = req.body.uid;
-  // console.log(uid);
+  console.log(uid);
   if (!init) {
     firebase_init();
   }
@@ -210,6 +192,36 @@ router.get("/userinfo", async (req, res, next) => {
     };
     res.status(200).send(send);
   }
+});
+
+async function set_room_data(collection, room_id, room_data) {
+  var db = admin.firestore();
+  const docRef = db.collection(collection).doc(room_id);
+  const res = await docRef.set({
+    room_data,
+  });
+  return res;
+}
+
+router.post("/roomjoin", async (req, res, next) => {
+  var room_id = req.body.room_id;
+  var uid = req.body.uid;
+  if (!init) {
+    firebase_init();
+  }
+  var room_data = await get_data_document("rooms", room_id);
+  room_data = room_data.data();
+  // console.log(room_data);
+  if (!room_data["participants"].includes(uid)) {
+    room_data["participants"].push(uid);
+  }
+  console.log(room_data);
+  var result = await set_room_data("rooms", room_id, room_data);
+  var user_data = await get_data_document("users", uid);
+  console.log(user_data);
+  var db = admin.firestore();
+  const docRef = db.collection(collection).doc(room_id);
+  res.send("ok");
 });
 
 module.exports = router;
