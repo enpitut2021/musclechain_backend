@@ -72,12 +72,12 @@ async function get_data(collection, doc) {
   var db = admin.firestore();
   var ref = db.collection(collection).doc(doc);
   const firebase_doc = await ref.get();
-  console.log(firebase_doc.exists);
+  // console.log(firebase_doc);
   if (!firebase_doc.exists) {
     return -1;
   } else {
     // console.log(firebase_doc.data());
-    return firebase_doc.data();
+    return firebase_doc;
   }
 }
 
@@ -142,8 +142,32 @@ router.get("/calories", async (req, res, next) => {
   if (calories == -1) {
     res.status(500).send("uid is not valid");
   } else {
-    var calories_list = calories.calories;
+    var calories_list = calories.data().calories;
     res.status(200).send(calories_list);
+  }
+});
+
+router.get("/userinfo", async (req, res, next) => {
+  var uid = req.body.uid;
+  // console.log(uid);
+  if (!init) {
+    firebase_init();
+  }
+  var doc = await get_data("users", uid);
+  var data = doc.data();
+  // console.log(data);
+  if (data == -1) {
+    res.status(500).send("uid is not valid");
+  } else {
+    var calories = data.calories;
+    var user_name = data.user_name;
+    var room_id = data.room._path["segments"][1];
+    var send = {
+      calories: calories,
+      user_name: user_name,
+      room_id: room_id,
+    };
+    res.status(200).send(send);
   }
 });
 
