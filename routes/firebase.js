@@ -61,6 +61,7 @@ async function user_login(email, password) {
     .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
+      console.log(errorCode, errorMsg);
     });
   return ok;
 }
@@ -115,7 +116,6 @@ router.post("/register", async (req, res, next) => {
     firebase_init();
   }
   var result = await add_user(email, password);
-  console.log(result);
   var s = {
     result: result ? 1 : 0,
   };
