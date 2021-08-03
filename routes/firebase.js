@@ -142,6 +142,23 @@ router.get("/calories", async (req, res, next) => {
   }
 });
 
+router.get("/room", async (req, res, next) => {
+  var uid = req.body.uid;
+  // console.log(uid);
+  if (!init) {
+    firebase_init();
+  }
+  var doc = await get_data("users", uid);
+  var data = doc.data();
+  // console.log(data);
+  if (data == -1) {
+    res.status(500).send("uid is not valid");
+  } else {
+    var room_id = data.room._path["segments"][1];
+    res.status(200).send({ room_id: room_id });
+  }
+});
+
 router.get("/userinfo", async (req, res, next) => {
   var uid = req.body.uid;
   // console.log(uid);
