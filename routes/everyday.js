@@ -118,33 +118,36 @@ axios.request(CONFIG1).then((res1) => {
     data[`calories.${dT}`] = Number(val1);
     console.log(data);
     const res = db.collection('users').doc('AumGFGYh9wPRUMR4C8TzlHojNuo1').update(data);
+    axios.request(CONFIG2).then((res2) => {
+        val2 = res2.data['activities-calories'][0]['value'];
+        data[`calories.${dT}`] = Number(val2);
+        console.log(data);
+        const res = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data);
+        if(val1>val2){
+            fight('AumGFGYh9wPRUMR4C8TzlHojNuo1','y1ThA6QLVAbt3BzsXaWTFSfBysk1',val1-val2);
+            data1[`balance_trace.${dT}`] = Number(val1-val2);
+            console.log(data1);
+            const res1 = db.collection('users').doc('AumGFGYh9wPRUMR4C8TzlHojNuo1').update(data1);
+            data2[`balance_trace.${dT}`] = Number(val2-val1);
+            const res2 = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data2);
+            console.log(data2);
+        }else if(val1<val2){
+            fight('y1ThA6QLVAbt3BzsXaWTFSfBysk1','AumGFGYh9wPRUMR4C8TzlHojNuo1',val2-val1);
+            data1[`balance_trace.${dT}`] = Number(val1-val2);
+            console.log(data1);
+            const res1 = db.collection('users').doc('AumGFGYh9wPRUMR4C8TzlHojNuo1').update(data1);
+            data2[`balance_trace.${dT}`] = Number(val2-val1);
+            const res2 = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data2);
+            console.log(data2);
+        }
+    }).catch((error) => {
+        console.log(error);
+    });
 }).catch((error) => {
     console.log(error);
 });
-axios.request(CONFIG2).then((res2) => {
-    val2 = res2.data['activities-calories'][0]['value'];
-    data[`calories.${dT}`] = Number(val2);
-    console.log(data);
-    const res = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data);
-}).catch((error) => {
-    console.log(error);
-});
+
 
 var data1 = {};
 var data2 = {};
 
-if(val1>val2){
-    fight('AumGFGYh9wPRUMR4C8TzlHojNuo1','y1ThA6QLVAbt3BzsXaWTFSfBysk1',val1-val2);
-    data1[`balance_trace.${dT}`] = Number(val1-val2);
-    console.log(data1);
-    const res1 = db.collection('users').doc('AumGFGYh9wPRUMR4C8TzlHojNuo1').update(data1);
-    data2[`balance_trace.${dT}`] = Number(val2-val1);
-    const res2 = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data2);
-}else if(val1<val2){
-    fight('y1ThA6QLVAbt3BzsXaWTFSfBysk1','AumGFGYh9wPRUMR4C8TzlHojNuo1',val2-val1);
-    data1[`balance_trace.${dT}`] = Number(val2-val1);
-    console.log(data1);
-    const res1 = db.collection('users').doc('AumGFGYh9wPRUMR4C8TzlHojNuo1').update(data1);
-    data2[`balance_trace.${dT}`] = Number(val1-val2);
-    const res2 = db.collection('users').doc('y1ThA6QLVAbt3BzsXaWTFSfBysk1').update(data2);
-}

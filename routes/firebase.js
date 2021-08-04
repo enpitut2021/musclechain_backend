@@ -147,11 +147,12 @@ router.get("/rooms", async (req, res, next) => {
     document_data,
     tmp;
   documents.forEach((doc) => {
-    // console.log(doc.data());
+    console.log(doc.data());
     document_data = doc.data();
     tmp = {
       room_id: document_data["room_id"],
       room_document_id: doc.id,
+      participants: document_data["participants"],
     };
     data.push(tmp);
   });
@@ -170,7 +171,7 @@ router.get("/uid", async (req, res, next) => {
   }
 });
 
-router.get("/userinfo", async (req, res, next) => {
+router.post("/userinfo", async (req, res, next) => {
   var uid = req.body.uid;
   // console.log(uid);
   if (!init) {
@@ -178,13 +179,13 @@ router.get("/userinfo", async (req, res, next) => {
   }
   var doc = await get_data_document("users", uid);
   var data = doc.data();
-  // console.log(data);
+  console.log(data);
   if (data == -1) {
     res.status(500).send("uid is not valid");
   } else {
     var calories = data.calories;
     var user_name = data.user_name;
-    var room_id = data.room._path["segments"][1];
+    var room_id = data.room;
     var send = {
       calories: calories,
       user_name: user_name,
@@ -197,43 +198,57 @@ router.get("/userinfo", async (req, res, next) => {
 async function set_room_data(collection, room_id, room_data) {
   var db = admin.firestore();
   const docRef = db.collection(collection).doc(room_id);
+  console.log(room_data);
   const res = await docRef.set({
-    start_time: room_data["start_time"],
-    end_time: room_data["end_time"],
+    start_date: room_data["start_date"],
+    end_date: room_data["end_date"],
     participants: room_data["participants"],
     room_id: room_data["room_id"],
   });
   return res;
 }
 
-router.post("/roomjoin", async (req, res, next) => {
-  var room_id = req.body.room_id;
-  var uid = req.body.uid;
-  if (!init) {
-    firebase_init();
-  }
-  var room_data = await get_data_document("rooms", room_id);
-  room_data = room_data.data();
-  // console.log(room_data);
-  if (!room_data["participants"].includes(uid)) {
-    room_data["participants"].push(uid);
-  }
-  console.log(room_data);
-  var result = await set_room_data("rooms", room_id, room_data);
-  var user_data = await get_data_document("users", uid);
-  var db = admin.firestore();
-  const room_ref = db.collection("rooms").doc(room_id);
-  var user_room_ref = user_data.data()["room"];
-  user_data.data()["room"] = room_ref;
-  const user_ref = db.collection("users").doc(uid);
-  const user_res = await user_ref.set({
-    calories: user_data.data()["calories"],
-    room: user_data.data()["room"],
-    user_name: user_data.data()["user_name"],
-  });
-  var prev_user_room = await user_room_ref.get();
-  console.log(prev_user_room);
-  res.send("ok");
-});
+//router.post("/roomjoin", async (req, res, next) => {
+//  var room_id = req.body.room_id;
+//  var uid = req.body.uid;
+//  if (!init) {
+//    firebase_init();
+//  }
+//  var room_data = await get_data_document("rooms", room_id);
+//  room_data = room_data.data();
+//  // console.log(room_data);
+//  if (!room_data["participants"].includes(uid)) {
+//    room_data["participants"].push(uid);
+//  }
+//  // console.log(room_data);
+//  var result = await set_room_data("rooms", room_id, room_data);
+//  //ユーザーの前居た部屋の情報を入れる
+//  var user_data = await get_data_document("users", uid);
+//  var user_room_ref = user_data.data()["room"];
+//  var prev_user_room = await user_room_ref.get();
+//  const newArray = prev_user_room
+//    .data()
+//    ["participants"].filter((n) => n !== uid);
+//  var prev_user_room_id = prev_user_room.id;
+//  var prev_room_data = {
+//    start_date: prev_user_room.data()["start_date"],
+//    end_date: prev_user_room.data()["end_date"],
+//    room_id: prev_user_room.data()["room_id"],
+//    participants: newArray,
+//  };
+//  var result = await set_room_data("rooms", prev_user_room_id, prev_room_data);
+
+//  var db = admin.firestore();
+//  const room_ref = db.collection("rooms").doc(room_id);
+//  user_data.data()["room"] = room_ref;
+//  const user_ref = db.collection("users").doc(uid);
+//  const user_res = await user_ref.set({
+//    calories: user_data.data()["calories"],
+//    room: user_data.data()["room"],
+//    user_name: user_data.data()["user_name"],
+//  });
+
+//  res.send("ok");
+//});
 
 module.exports = router;
